@@ -1,21 +1,26 @@
-# Agent Conductor
+# AI Pit Crew
 
-A lightweight workflow for building software with **multiple AI coding assistants running simultaneously in the same IDE** — while keeping a human in control of planning, prioritization, and decisions.
+A lightweight workflow for building software with **multiple AI coding assistants running simultaneously in the same IDE** — while keeping the human engineer close to every decision.
 
-The goal is not to automate software engineering. The goal is to amplify it.
+*Slow is smooth. Smooth is fast.*
 
 ---
 
 ## The Problem This Solves
 
-Modern IDEs let you run Claude Code, GitHub Copilot, Gemini Code Assist, and other AI tools at the same time. That's powerful, but without structure it creates problems:
+Most AI development workflows push the engineer out of the loop. Hand over the project, cross your fingers, and hope the output is usable. That approach produces code nobody understands, architecture nobody owns, and decisions nobody remembers making.
 
-- Each tool maintains its own context and may make conflicting decisions
-- No shared understanding of what is being built or why
-- No clear boundary between what agents decide and what the human decides
-- Code written by one tool never gets reviewed by another
+There is also a practical problem: fully autonomous AI orchestration is expensive. Token costs add up fast when one model is instructing another, and you are locked in to a single provider until your usage limits hit — at which point everything stops.
 
-This workflow solves that by treating the **repository itself as the shared workspace** for all agents.
+This workflow takes the opposite approach. Modern IDEs let you run Claude Code, GitHub Copilot, Gemini Code Assist, and other tools at the same time. AI Pit Crew gives that combination a structure that keeps the human engineer in the driver's seat:
+
+- The human sets direction, approves decisions, and reviews every change
+- Agents do the implementation, testing, and cross-review work
+- All tools share the same documentation so nothing falls out of sync
+- No expensive orchestration layer — you direct the agents yourself
+- When you hit a usage limit on one tool, switch to another and keep moving
+
+This works because the **repository is the shared workspace**. Every agent reads the same product, architecture, and task docs before starting work.
 
 ---
 
@@ -136,7 +141,7 @@ If you are an AI agent assigned to work on this project, follow these steps:
 
 1. **Copy this repository** as your starting point.
    - On GitHub: click **Use this template** to create a new repo from it.
-   - Without GitHub: `git clone https://github.com/YOUR-USERNAME/agent-conductor my-project && cd my-project && rm -rf .git && git init`
+   - Without GitHub: `git clone https://github.com/bobbylough/ai-pit-crew my-project && cd my-project && rm -rf .git && git init`
 
 2. **Delete the example content** that is specific to this template and should not carry over:
    - Clear the `## Done` and `## Ready For Review` sections in `TASKS.md`
@@ -241,7 +246,7 @@ See [`.agent-workflow.md`](.agent-workflow.md) for the detailed loop with format
 
 `CLAUDE.md` is loaded automatically. No setup needed — Claude reads it on every session.
 
-The `.claude/agents/` directory contains sub-agent personas for Planner, Reviewer, and Tester roles. Invoke them by telling Claude which role to take.
+The `.claude/agents/` directory contains sub-agent personas for Developer, Planner, Reviewer, and Tester roles. Invoke them by telling Claude which role to take (e.g. "act as the Developer agent").
 
 ### GitHub Copilot
 
@@ -304,10 +309,16 @@ A task is complete when:
 
 ## Philosophy
 
-Most AI development workflows focus on replacing the engineer.
+Most AI development workflows are built around a single idea: hand the project to an AI and get software back. Don't look too closely at what it built or why. Just ship it and iterate.
 
-This workflow assumes the opposite.
+That approach produces results that are fast to generate and slow to trust. Nobody on the team fully understands the system. Architecture decisions are buried in chat history. When something breaks in production, nobody knows where to start.
 
-The human remains responsible for product judgment, prioritization, and architecture. AI agents provide leverage through implementation, review, planning assistance, and documentation.
+AI Pit Crew is built on the opposite assumption: **the human engineer should stay close to every meaningful decision.**
 
-The goal is not autonomous software development. The goal is human-directed software development at a higher velocity.
+You are the orchestrator. The AI tools are your pit crew — fast, capable, specialized — but you call the stops. You decide what gets built, in what order, and why. You review every change before it merges. You own the architecture.
+
+*Slow is smooth. Smooth is fast.*
+
+Moving deliberately — writing clear requirements, reviewing each change, documenting decisions as you go — produces better software faster than sprinting blind. You spend less time debugging code you don't understand and more time building things that work.
+
+This workflow also has a practical advantage: it does not require expensive autonomous orchestration. No model is paying another model to think. You direct the agents yourself, which costs nothing extra and keeps you in the loop by design. And because all agents work from the same shared documentation, you can switch tools whenever you need to — if you hit a usage limit with Claude, pick up the same task in Copilot or Gemini without losing context.
