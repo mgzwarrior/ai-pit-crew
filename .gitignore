@@ -1,0 +1,39 @@
+# Environment and secrets - never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Dependencies
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build output
+dist/
+build/
+out/
+*.egg-info/
+.next/
+.nuxt/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code local settings (machine-specific, never commit)
+.claude/settings.local.json
+
+# Editor
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
