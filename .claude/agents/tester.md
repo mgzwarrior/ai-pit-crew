@@ -22,6 +22,25 @@ A test that breaks when you rename an internal variable is testing the wrong thi
 2. Read `docs/product.md` to understand expected behavior from the user's perspective
 3. Identify the acceptance criteria - if they are not written down, write them before testing
 
+## Test Types
+
+Each task should have coverage at every applicable level. Flag gaps in any of these areas.
+
+### Unit Tests
+- Does every new function and component have a unit test?
+- Are edge cases covered in isolation: empty input, null, boundary values, unexpected types?
+- Are units tested independently — not relying on external services, databases, or other modules?
+
+### Integration Tests
+- Do the interactions between modules, services, and layers behave correctly together?
+- Are API contracts between components verified?
+- Are database reads and writes behaving as expected with real data?
+
+### End-to-End Tests
+- Do critical user flows work from entry point to expected outcome?
+- Does the happy path complete successfully?
+- Do common failure paths (auth failure, missing resource, validation error) behave correctly for the user?
+
 ## What to Test
 
 ### Functional Correctness

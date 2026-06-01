@@ -34,6 +34,11 @@ Produce maintainable, reliable, secure, production-ready software that is easy t
 - Prefer TDD when practical
 - Test business behavior and expected outcomes, not implementation details
 - Ensure all tests pass before considering work complete
+- Write tests at each applicable level:
+  - **Unit tests** — individual functions and components in isolation
+  - **Integration tests** — interactions between modules, services, or layers
+  - **End-to-end tests** — full user flows from entry point to expected outcome
+- A feature is not complete without coverage at each level that applies to it
 
 ### Documentation and Observability
 

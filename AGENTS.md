@@ -49,7 +49,8 @@ Work is ready for review when:
 - Prefer small, focused changes
 - Do not refactor code unrelated to your task
 - Do not add features beyond the task scope
-- Write tests for new behavior
+- Write tests for all new behavior — unit tests for individual functions and components, integration tests for interactions between modules, and end-to-end tests for critical user flows
+- Do not consider a feature complete without test coverage at each applicable level
 - Leave comments only when the _why_ is non-obvious
 
 ### When You Are Uncertain
