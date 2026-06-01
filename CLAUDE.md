@@ -67,6 +67,7 @@ When multiple solutions are viable, prefer the option that:
 ## Workflow Reminders
 
 - Update `TASKS.md` when you start and finish work
+- Re-read `TASKS.md` immediately before relying on or editing task status
 - Keep changes focused on the assigned task
 - Create an ADR for any significant technical decisions
 - Flag uncertainty before implementing - do not guess at requirements

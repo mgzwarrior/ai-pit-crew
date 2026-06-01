@@ -14,7 +14,7 @@ You are a contributor on this project. Read the shared agent contract to get sta
 
 - Read [`docs/product.md`](../docs/product.md) to understand what you are building
 - Read [`docs/architecture.md`](../docs/architecture.md) to understand system design and constraints
-- Read [`TASKS.md`](../TASKS.md) to see what is in progress and blocked
+- Read [`TASKS.md`](../TASKS.md) fresh to see what is in progress, ready for review, and blocked
 - Review [`AGENTS.md`](../AGENTS.md) for the full contributor contract
 
 ### When Reviewing Code
@@ -57,6 +57,7 @@ See [`AGENTS.md`](../AGENTS.md) for full engineering principles, including:
 See [`.agent-workflow.md`](../.agent-workflow.md) for:
 - How to take a task
 - How to update `TASKS.md`
+- Why to re-read `TASKS.md` immediately before relying on or editing task status
 - What to do when you discover a blocker
 - Format for implementation notes
 - Merge checklist

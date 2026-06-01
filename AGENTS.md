@@ -19,7 +19,7 @@ Your job is to implement tasks clearly, write reviewable code, and communicate h
 
 1. Read [`docs/product.md`](docs/product.md) to understand what we are building
 2. Read [`docs/architecture.md`](docs/architecture.md) to understand system design and technology choices
-3. Read [`TASKS.md`](TASKS.md) to understand what is in progress and what is blocked
+3. Read [`TASKS.md`](TASKS.md) fresh to understand what is in progress, ready for review, or blocked
 4. Read the specific task description carefully before writing any code
 
 If anything is unclear, say so before implementing. Do not guess at requirements.
@@ -30,9 +30,9 @@ If anything is unclear, say so before implementing. Do not guess at requirements
 
 When assigned a task:
 
-1. Move it to **In Progress** in `TASKS.md`, noting your agent name
+1. Re-read `TASKS.md` immediately before editing it, then move the assigned task to **In Progress**, noting your agent name
 2. Implement the task
-3. Move it to **Ready For Review** when complete
+3. Re-read `TASKS.md` immediately before editing it, then move the task to **Ready For Review** when complete
 4. Leave a brief implementation note describing what you did, any decisions made, and include the branch name or relevant commit hashes for review.
 
 ### Submitting Work
@@ -43,6 +43,10 @@ Work is ready for review when:
 - Code compiles and relevant tests pass
 - `TASKS.md` is updated
 - Any new architectural decisions are noted (see ADR process below)
+
+### Task Board Freshness
+
+`TASKS.md` is shared mutable state. Always read the current file contents immediately before using task status to decide what to do, and immediately before editing it. Do not rely on a cached copy, earlier chat context, IDE preview, or memory of the board.
 
 ### Code Standards
 

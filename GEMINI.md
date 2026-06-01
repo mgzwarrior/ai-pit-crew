@@ -67,6 +67,7 @@ Be specific and constructive. Vague approval is not useful.
 
 - Read [`AGENTS.md`](AGENTS.md) before starting any task
 - Update `TASKS.md` when starting and completing work
+- Re-read `TASKS.md` immediately before relying on or editing task status
 - Keep changes scoped to the assigned task
 - Do not refactor code unrelated to your task
 - Create an ADR for significant technical decisions
