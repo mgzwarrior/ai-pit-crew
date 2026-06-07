@@ -8,13 +8,14 @@ run from a freshly cloned template without bootstrapping dependencies first.
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 
-ALL_TOOLS = ("claude", "copilot", "gemini")
+ALL_TOOLS = ("claude", "copilot", "gemini", "codex")
 
 CORE_FILES = (
     "AGENTS.md",
@@ -38,6 +39,8 @@ TOOL_FILES = {
     ),
     "copilot": (".github/copilot-instructions.md",),
     "gemini": ("GEMINI.md",),
+    # Codex uses AGENTS.md directly, which is installed as a core file.
+    "codex": (),
 }
 
 NEW_PROJECT_DIRS = (
@@ -48,6 +51,15 @@ NEW_PROJECT_DIRS = (
 
 README_MARKER_START = "<!-- ai-pit-crew:start -->"
 README_MARKER_END = "<!-- ai-pit-crew:end -->"
+
+STYLE = {
+    "bold": "1",
+    "dim": "2",
+    "cyan": "36",
+    "green": "32",
+    "yellow": "33",
+    "red": "31",
+}
 
 
 @dataclass(frozen=True)
@@ -160,6 +172,34 @@ def parse_tools(raw_tools: str) -> tuple[str, ...]:
         valid = ", ".join(("all", "none", *ALL_TOOLS))
         raise argparse.ArgumentTypeError(f"unknown tool(s): {names}; valid values: {valid}")
     return tools
+
+
+def supports_color(stream: object = sys.stdout) -> bool:
+    return bool(getattr(stream, "isatty", lambda: False)()) and "NO_COLOR" not in os.environ
+
+
+def resolve_color_mode(mode: str, stream: object = sys.stdout) -> bool:
+    if mode == "always":
+        return True
+    if mode == "never":
+        return False
+    return supports_color(stream)
+
+
+def style(text: str, *names: str, color: bool) -> str:
+    if not color:
+        return text
+    codes = ";".join(STYLE[name] for name in names)
+    return f"\033[{codes}m{text}\033[0m"
+
+
+def heading(text: str, *, color: bool) -> str:
+    return style(text, "bold", "cyan", color=color)
+
+
+def status_value(value: bool, *, color: bool) -> str:
+    label = "yes" if value else "no"
+    return style(label, "green" if value else "yellow", color=color)
 
 
 def clean_tasks_template() -> str:
@@ -309,6 +349,8 @@ def build_plan(template: Path, target: Path, options: InstallOptions) -> Install
         )
 
     for tool in options.tools:
+        if not TOOL_FILES[tool]:
+            skipped.append(f"{tool}: uses AGENTS.md; no extra files needed")
         for rel_path in TOOL_FILES[tool]:
             add_file_action(
                 actions,
@@ -415,36 +457,43 @@ def apply_plan(plan: InstallPlan) -> None:
             action.path.write_text(action.content or "", encoding="utf-8")
 
 
-def format_plan(plan: InstallPlan) -> str:
+def format_plan(plan: InstallPlan, *, color: bool = False) -> str:
     lines = [
-        f"Target: {plan.scan.path}",
-        f"Mode: {plan.mode}",
-        f"Recommendation: {plan.recommendation}",
+        heading("AI Pit Crew installer", color=color),
+        f"{style('Target', 'bold', color=color)}: {plan.scan.path}",
+        f"{style('Mode', 'bold', color=color)}: {style(plan.mode, 'green', color=color)}",
+        f"{style('Recommendation', 'bold', color=color)}: {plan.recommendation}",
         "",
-        "Scan:",
-        f"- Exists: {'yes' if plan.scan.exists else 'no'}",
-        f"- Empty: {'yes' if plan.scan.is_empty else 'no'}",
-        f"- Git repo: {'yes' if plan.scan.is_git_repo else 'no'}",
-        f"- README: {'yes' if plan.scan.has_readme else 'no'}",
-        f"- Languages: {', '.join(plan.scan.languages) if plan.scan.languages else 'none detected'}",
+        heading("Scan", color=color),
+        f"  Exists: {status_value(plan.scan.exists, color=color)}",
+        f"  Empty: {status_value(plan.scan.is_empty, color=color)}",
+        f"  Git repo: {status_value(plan.scan.is_git_repo, color=color)}",
+        f"  README: {status_value(plan.scan.has_readme, color=color)}",
+        f"  Languages: {', '.join(plan.scan.languages) if plan.scan.languages else 'none detected'}",
         "",
-        "Actions:",
+        heading("Actions", color=color),
     ]
 
     if plan.actions:
         for action in plan.actions:
-            marker = "overwrite" if action.overwrite else action.kind
-            lines.append(f"- [{marker}] {action.description}: {action.path}")
+            marker = "OVERWRITE" if action.overwrite else action.kind.upper()
+            marker_color = "yellow" if action.overwrite else "green"
+            lines.append(
+                "  "
+                + style(f"[{marker}]", marker_color, color=color)
+                + f" {action.description}"
+            )
+            lines.append(f"       {style(str(action.path), 'dim', color=color)}")
     else:
-        lines.append("- No changes needed.")
+        lines.append(f"  {style('[OK]', 'green', color=color)} No changes needed.")
 
     if plan.skipped:
-        lines.extend(("", "Skipped:"))
-        lines.extend(f"- {item}" for item in plan.skipped)
+        lines.extend(("", heading("Skipped", color=color)))
+        lines.extend(f"  {style('[SKIP]', 'yellow', color=color)} {item}" for item in plan.skipped)
 
     if plan.warnings:
-        lines.extend(("", "Warnings:"))
-        lines.extend(f"- {item}" for item in plan.warnings)
+        lines.extend(("", heading("Warnings", color=color)))
+        lines.extend(f"  {style('[WARN]', 'red', color=color)} {item}" for item in plan.warnings)
 
     return "\n".join(lines)
 
@@ -467,7 +516,7 @@ def interactive_options(args: argparse.Namespace, scan: RepoScan) -> InstallOpti
     tools = args.tools
     print(f"Selected tools: {', '.join(tools) if tools else 'none'}")
     if confirm("Change selected tools?", default=False):
-        raw_tools = input("Tools (all, none, or comma-separated claude,copilot,gemini): ")
+        raw_tools = input("Tools (all, none, or comma-separated claude,copilot,gemini,codex): ")
         tools = parse_tools(raw_tools or "all")
 
     update_readme = args.update_readme
@@ -491,6 +540,13 @@ def interactive_options(args: argparse.Namespace, scan: RepoScan) -> InstallOpti
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Install AI Pit Crew into a new or existing project.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""examples:
+  New project:      python3 scripts/install.py ../my-project --mode new
+  Existing project: python3 scripts/install.py /path/to/repo --mode append --update-readme
+  Preview only:     python3 scripts/install.py /path/to/repo --dry-run
+  Non-interactive:  python3 scripts/install.py /path/to/repo --mode auto --tools all --yes
+""",
     )
     parser.add_argument(
         "target",
@@ -508,7 +564,19 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--tools",
         type=parse_tools,
         default=ALL_TOOLS,
-        help="Tool config to install: all, none, or comma-separated claude,copilot,gemini.",
+        metavar="TOOLS",
+        help="Tool config to install: all, none, or comma-separated claude,copilot,gemini,codex.",
+    )
+    parser.add_argument(
+        "--color",
+        choices=("auto", "always", "never"),
+        default="auto",
+        help="Control colored output. Defaults to auto.",
+    )
+    parser.add_argument(
+        "--no-color",
+        action="store_true",
+        help="Disable colored output. Also respected through the NO_COLOR environment variable.",
     )
     parser.add_argument(
         "--project-name",
@@ -545,6 +613,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv or sys.argv[1:])
+    if args.no_color:
+        args.color = "never"
     target = Path(args.target).expanduser().resolve()
     scan = scan_repository(target)
     interactive = sys.stdin.isatty() and not args.yes and not args.dry_run
@@ -561,22 +631,23 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     plan = build_plan(template_root(), target, options)
-    print(format_plan(plan))
+    color = resolve_color_mode(args.color)
+    print(format_plan(plan, color=color))
 
     if args.dry_run:
-        print("\nDry run only; no files changed.")
+        print("\n" + style("Dry run only; no files changed.", "yellow", color=color))
         return 0
 
     if not args.yes:
         if not interactive:
-            print("\nRun again with --yes to apply this plan.")
+            print("\n" + style("Run again with --yes to apply this plan.", "yellow", color=color))
             return 0
         if not confirm("Apply this plan?", default=False):
-            print("No files changed.")
+            print(style("No files changed.", "yellow", color=color))
             return 0
 
     apply_plan(plan)
-    print("\nAI Pit Crew installation complete.")
+    print("\n" + style("AI Pit Crew installation complete.", "green", color=color))
     return 0
 
 

@@ -21,6 +21,9 @@ _No tasks in progress._
   - Implementation notes:
     - Added `scripts/install.py`, a stdlib Python wizard for new-project scaffolds and append-to-existing installs.
     - Added repository scanning, mode recommendation, tool selection, dry-run, confirmation, `--yes`, `--force`, and optional README updates.
+    - Improved installer output with sectioned, color-capable terminal formatting plus `--color` / `--no-color`.
+    - Added Codex as a selectable tool; Codex uses the core `AGENTS.md` instructions rather than an extra config file.
+    - Expanded `--help` with examples and documented the full option list in `README.md`.
     - Added `tests/test_install_wizard.py` for scanner, planner, and apply behavior.
     - Documented guided installer usage in `README.md`.
     - Verified with `python3 -m unittest tests/test_install_wizard.py`.

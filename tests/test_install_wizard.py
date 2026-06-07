@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import sys
 import tempfile
 import unittest
@@ -64,6 +66,49 @@ class InstallWizardTest(unittest.TestCase):
             self.assertIn("src/.gitkeep", action_paths)
             self.assertIn("README.md", action_paths)
             self.assertNotIn("GEMINI.md", action_paths)
+
+    def test_codex_tool_uses_core_agent_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "fresh"
+            options = pitcrew_install.InstallOptions(
+                mode="new",
+                tools=("codex",),
+                force=False,
+                update_readme=False,
+                project_name="Fresh App",
+            )
+
+            plan = pitcrew_install.build_plan(pitcrew_install.template_root(), target, options)
+            action_paths = {action.path.relative_to(target).as_posix() for action in plan.actions}
+
+            self.assertIn("codex: uses AGENTS.md; no extra files needed", plan.skipped)
+            self.assertIn("AGENTS.md", action_paths)
+
+    def test_format_plan_can_emit_color(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "fresh"
+            options = pitcrew_install.InstallOptions(
+                mode="new",
+                tools=(),
+                force=False,
+                update_readme=False,
+                project_name="Fresh App",
+            )
+            plan = pitcrew_install.build_plan(pitcrew_install.template_root(), target, options)
+
+            output = pitcrew_install.format_plan(plan, color=True)
+
+            self.assertIn("\033[", output)
+            self.assertIn("AI Pit Crew installer", output)
+
+    def test_help_includes_examples(self) -> None:
+        buffer = io.StringIO()
+
+        with contextlib.redirect_stdout(buffer), self.assertRaises(SystemExit) as raised:
+            pitcrew_install.parse_args(["--help"])
+
+        self.assertEqual(raised.exception.code, 0)
+        self.assertIn("examples:", buffer.getvalue())
 
     def test_append_plan_skips_existing_files_and_updates_readme(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

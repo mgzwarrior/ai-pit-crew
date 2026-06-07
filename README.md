@@ -151,15 +151,13 @@ The easiest way to add AI Pit Crew is the guided installer. It scans the target
 directory, recommends either a new-project scaffold or an append-to-existing-repo
 install, prints the exact plan, and only writes files after confirmation.
 
-Create a new project scaffold:
+The two simplest commands cover the common paths:
 
 ```bash
+# New project
 python3 scripts/install.py ../my-project --mode new
-```
 
-Append AI Pit Crew to an existing repository:
-
-```bash
+# Existing project
 python3 scripts/install.py /path/to/existing-repo --mode append --update-readme
 ```
 
@@ -184,9 +182,32 @@ The installer is intentionally conservative:
 - `TASKS.md` is installed as a clean active-work board, without template
   history.
 - `--tools` accepts `all`, `none`, or a comma-separated list of
-  `claude,copilot,gemini`.
+  `claude,copilot,gemini,codex`.
 - In append mode, `--update-readme` adds a small AI Pit Crew section to an
   existing README or creates one if missing.
+
+Get interactive help:
+
+```bash
+python3 scripts/install.py --help
+```
+
+Available options:
+
+| Option | Values | Purpose |
+| --- | --- | --- |
+| `target` | path | Project directory to create or update. Defaults to the current directory. |
+| `--mode` | `auto`, `new`, `append` | Choose install mode. `auto` scans the target and recommends the path. |
+| `--tools` | `all`, `none`, `claude,copilot,gemini,codex` | Choose which tool-specific instruction files to install. Codex uses `AGENTS.md`, so it does not add an extra file. |
+| `--project-name` | text | Name used in the generated README for new projects. |
+| `--update-readme` | flag | Append or create an AI Pit Crew README section in append mode. |
+| `--no-prompt-readme` | flag | Skip the interactive README update question in append mode. |
+| `--force` | flag | Overwrite existing files instead of skipping them. |
+| `--dry-run` | flag | Print the plan without writing files. |
+| `--yes`, `-y` | flag | Apply the plan without prompting. |
+| `--color` | `auto`, `always`, `never` | Control colored output. Defaults to `auto`. |
+| `--no-color` | flag | Disable colored output. The installer also honors `NO_COLOR`. |
+| `--help`, `-h` | flag | Show usage, examples, and options. |
 
 ### Starting A New Project
 
