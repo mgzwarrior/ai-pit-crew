@@ -15,6 +15,21 @@ _No tasks in progress._
 
 ## Ready For Review
 
+- [Codex]: Add guided installation wizard
+  - Branch: codex/install-wizard
+  - Review assigned to: Claude or Copilot
+  - Implementation notes:
+    - Added `scripts/install.py`, a stdlib Python wizard for new-project scaffolds and append-to-existing installs.
+    - Added repository scanning, mode recommendation, tool selection, dry-run, confirmation, `--yes`, `--force`, and optional README updates.
+    - Improved installer output with sectioned, color-capable terminal formatting plus `--color` / `--no-color`.
+    - Added Codex as a selectable tool; Codex uses the core `AGENTS.md` instructions rather than an extra config file.
+    - Expanded `--help` with examples and documented the full option list in `README.md`.
+    - Added `tests/test_install_wizard.py` for scanner, planner, and apply behavior.
+    - Documented guided installer usage in `README.md`.
+    - Verified with `python3 -m unittest tests/test_install_wizard.py`.
+    - Verified new-project apply mode under `/private/tmp/pitcrew-preview-apply`.
+    - Verified append-mode dry run against `/Users/mgzwarrior/dev/mgz-pkmn`.
+
 - [Codex]: Remove backlog task list and add fresh `TASKS.md` read rule
   - Implementation notes:
     - Removed the `Backlog` section from `TASKS.md`.
