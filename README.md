@@ -137,12 +137,56 @@ If you are an AI agent assigned to work on this project, follow these steps:
 |
 |-- src/                             # Application source code
 |-- tests/                           # Test suite
-`-- scripts/                         # Utility scripts
+`-- scripts/
+    `-- install.py                    # Guided setup wizard
 ```
 
 ---
 
 ## Using This Template
+
+### Guided Installer
+
+The easiest way to add AI Pit Crew is the guided installer. It scans the target
+directory, recommends either a new-project scaffold or an append-to-existing-repo
+install, prints the exact plan, and only writes files after confirmation.
+
+Create a new project scaffold:
+
+```bash
+python3 scripts/install.py ../my-project --mode new
+```
+
+Append AI Pit Crew to an existing repository:
+
+```bash
+python3 scripts/install.py /path/to/existing-repo --mode append --update-readme
+```
+
+Preview without writing files:
+
+```bash
+python3 scripts/install.py /path/to/project --dry-run
+```
+
+Run non-interactively:
+
+```bash
+python3 scripts/install.py /path/to/project --mode auto --tools all --update-readme --yes
+```
+
+The installer is intentionally conservative:
+
+- `--mode auto` recommends `new` for missing or empty targets and `append` for
+  existing repositories.
+- Existing files are skipped by default; use `--force` only when you want to
+  overwrite them.
+- `TASKS.md` is installed as a clean active-work board, without template
+  history.
+- `--tools` accepts `all`, `none`, or a comma-separated list of
+  `claude,copilot,gemini`.
+- In append mode, `--update-readme` adds a small AI Pit Crew section to an
+  existing README or creates one if missing.
 
 ### Starting A New Project
 
